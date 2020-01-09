@@ -1,0 +1,11 @@
+{
+    "l_freq": 0.1,
+    "h_freq": 40,
+    "ECG_ch_name": "EEG063",
+    "EoG_ch_name": "EEG061, EEG062",
+    "variance": 0.999,
+    "reject": {
+        "mag": 4e-12,
+        "grad": 4000e-13
+        }
+}
