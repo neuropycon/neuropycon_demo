@@ -1,7 +1,7 @@
 """
-========================
-Compute inverse solution
-========================
+============================
+04. Compute inverse solution
+============================
 The inverse solution pipeline performs source reconstruction starting from the
 raw data specified by the user. The input raw data are epoched accordingly to
 events specified in json file and created in script 03. The evoked datasets are

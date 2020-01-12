@@ -1,12 +1,12 @@
-# -*- coding: utf-8 -*-
 """
-Created on Tue Jan 19 11:11:02 2016
+==================================
+01. Freesurfer anatomical pipeline
+==================================
 
-@author: pasca
+This workflow runs the nipype Interface wrapping the recon-all command of
+Freesurfer. The BEM surfaces used for forward modeling are also generated.
 
-Call recon-all on set of subjects and then run the MNE watershed bem algorithm
-    python smri_reconall.py
-
+Make sure that Freesurfer is properly configured before running this script.
 """
 
 # Import modules
