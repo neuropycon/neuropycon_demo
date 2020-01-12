@@ -19,7 +19,7 @@ if getpass.getuser() == 'pasca':
     MRI_path = meg_dir
     data_path = os.path.join(meg_dir, 'ds117')
 
-    NJOBS = 6
+    NJOBS = 4
 
 elif getpass.getuser() == 'karim':
     meg_dir = '/home/karim/Tools/python/Projets/mne-biomag-group-demo/'
@@ -28,7 +28,7 @@ elif getpass.getuser() == 'karim':
     MRI_path = os.path.join(meg_dir, 'ds117')
     data_path = os.path.join(meg_dir, 'ds117')
 
-    NJOBS = 6
+    NJOBS = 4
 
 else:
     main_path = ''
@@ -56,3 +56,6 @@ data_type = 'fif'
 
 fsaverage_vertices = [np.arange(10242), np.arange(10242)]
 smooth = 10
+
+
+conditions = ['famous', 'scrambled', 'unfamiliar']
