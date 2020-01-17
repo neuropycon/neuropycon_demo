@@ -8,8 +8,6 @@ import getpass
 import numpy as np
 
 
-is_nii = True  # True if you have MRI files in nii format
-
 # TODO -> define all important dir (i.e set sbj dir path, i.e. where the
 #         FreeSurfer folders are)
 if getpass.getuser() == 'pasca':
