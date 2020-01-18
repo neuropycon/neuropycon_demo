@@ -18,6 +18,7 @@ from nipype.interfaces.freesurfer import ReconAll
 from nipype.interfaces.utility import Function
 
 from ephypype.nodes import create_iterator, create_datagrabber
+from ephypype.compute_fwd_problem import _create_bem_sol
 
 from params import subjects_dir, subject_ids, NJOBS
 from params import MRI_path, FS_WF_name, MAIN_WF_name
@@ -75,57 +76,12 @@ def create_main_workflow_FS_segmentation():
     main_workflow = pe.Workflow(name=MAIN_WF_name)
     main_workflow.base_dir = subjects_dir
 
-    def mne_watershed_bem(sbj_dir, sbj_id):
-
-        from mne.bem import make_watershed_bem
-        print('call make_watershed_bem')
-        make_watershed_bem(sbj_id, sbj_dir, overwrite=True)
-
-        return sbj_id
-
     bem_generation = pe.Node(interface=Function(
-            input_names=['sbj_dir', 'sbj_id'], output_names=['sbj_id'],
-            function=mne_watershed_bem), name='call_mne_watershed_bem')
-    bem_generation.inputs.sbj_dir = subjects_dir
+            input_names=['subjects_dir', 'sbj_id'], output_names=['sbj_id'],
+            function=_create_bem_sol), name='call_mne_watershed_bem')
+    bem_generation.inputs.subjects_dir = subjects_dir
     main_workflow.connect(reconall_workflow, 'recon_all.subject_id',
                           bem_generation, 'sbj_id')
-
-    # (4) copy the generated meshes from bem/watershed to bem/ and change the
-    # names according to MNE
-    def copy_surfaces(sbj_id):
-        import os
-        import os.path as op
-        from params import subjects_dir
-        from mne.report import Report
-
-        report = Report()
-
-        surf_names = ['brain_surface', 'inner_skull_surface',
-                      'outer_skull_surface',  'outer_skin_surface']
-        new_surf_names = ['brain.surf', 'inner_skull.surf',
-                          'outer_skull.surf', 'outer_skin.surf']
-
-        bem_dir = op.join(subjects_dir, sbj_id, 'bem')
-        surface_dir = op.join(subjects_dir, sbj_id, 'bem/watershed')
-
-        for i in range(len(surf_names)):
-            os.system('cp %s %s' % (op.join(surface_dir, sbj_id + '_' + surf_names[i]),  # noqa
-                                   op.join(bem_dir, new_surf_names[i])))
-
-        report.add_bem_to_section(subject=sbj_id, subjects_dir=subjects_dir)
-        report_filename = op.join(bem_dir, "BEM_report.html")
-        print('*** REPORT file %s written ***' % report_filename)
-        print(report_filename)
-        report.save(report_filename, open_browser=False, overwrite=True)
-
-        return sbj_id
-
-    copy_bem_surf = pe.Node(interface=Function(input_names=['sbj_id'],
-                                               output_names=['sbj_id'],
-                                               function=copy_surfaces),
-                            name='copy_bem_surf')
-
-    main_workflow.connect(bem_generation, 'sbj_id', copy_bem_surf, 'sbj_id')
 
     return main_workflow
 
