@@ -58,9 +58,10 @@ def run_events_concatenate(subject_id):
 
     raw, events = mne.concatenate_raws(raw_list, events_list=events_list)
     raw.set_eeg_reference(projection=True)
-    raw.save(op.join(out_path, '{}_sss_filt_ica-raw.fif'.format(subject)))
+    raw.save(op.join(out_path, '{}_sss_filt_ica-raw.fif'.format(subject)),
+             overwrite=True)
     mne.write_events(op.join(
-            data_path, '{}_sss_filt_ica-raw-eve.fif'.format(subject)), events)
+            out_path, '{}_sss_filt_ica-raw-eve.fif'.format(subject)), events)
     del raw_list
     del raw
 

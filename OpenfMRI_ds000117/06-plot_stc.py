@@ -11,13 +11,16 @@ import numpy as np
 from mayavi import mlab
 import mne
 
-from params import exclude_subjects, meg_dir, subjects_dir, conditions
+from params import main_path
+from params import exclude_subjects, data_path, subjects_dir, conditions
 
 
 os.environ['ETS_TOOLKIT'] = 'qt4'
 os.environ['QT_API'] = 'pyqt5'
 
-
+fig_path = op.join(main_path, 'figures')
+if not os.path.isdir(fig_path):
+    os.mkdir(fig_path)
 # PLot
 stc_condition = list()
 for cond in conditions:
@@ -25,9 +28,9 @@ for cond in conditions:
     for subject_id in range(1, 20):
         if subject_id not in exclude_subjects:
             subject = "sub%03d" % subject_id
-            data_path = op.join(meg_dir, 'ds117', subject, 'MEG')
+            out_path = op.join(data_path, subject, 'MEG')
             stc = mne.read_source_estimate(
-                    op.join(data_path, 'mne_dSPM_inverse_morph-%s' % (cond)))
+                    op.join(out_path, 'mne_dSPM_inverse_morph-%s' % (cond)))
             stcs.append(stc)
 
     data = np.average([np.abs(s.data) for s in stcs], axis=0)
@@ -43,7 +46,7 @@ data = np.abs(data)
 stc_contrast = mne.SourceEstimate(
         data, stc_condition[0].vertices, stc_condition[0].tmin,
         stc_condition[0].tstep, 'fsaverage')
-# stc_contrast.save(op.join(meg_dir, 'figures', 'stc_dspm_difference_norm'))
+# stc_contrast.save(op.join(fig_path, 'stc_dspm_difference_norm'))
 
 lims = (0.25, 0.75, 1)
 clim = dict(kind='value', lims=lims)
@@ -53,4 +56,4 @@ brain_dspm = stc_contrast.plot(
     clim=clim, foreground='k', backend='auto')
 
 mlab.view(90, 180, roll=180, focalpoint=(0., 15., 0.), distance=500)
-brain_dspm.save_image(op.join(meg_dir, 'figures', 'dspm-contrast'))
+brain_dspm.save_image(op.join(fig_path, 'dspm-contrast'))

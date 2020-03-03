@@ -11,20 +11,19 @@ import numpy as np
 # TODO -> define all important dir (i.e set sbj dir path, i.e. where the
 #         FreeSurfer folders are)
 if getpass.getuser() == 'pasca':
-    meg_dir = '/home/pasca/Tools/python/Projets/mne-biomag-group-demo/'
-
-    subjects_dir = os.path.join(meg_dir, 'FSF')
-    MRI_path = meg_dir
-    data_path = os.path.join(meg_dir, 'ds117')
+    main_path = '/media/pasca/pasca_media/temp/OpenfMRI_ds000117'
+    subjects_dir = os.path.join(main_path, 'FSF')
+    MRI_path = os.path.join(main_path, 'data')
+    data_path = os.path.join(main_path, 'data')
 
     NJOBS = 4
 
 elif getpass.getuser() == 'karim':
-    meg_dir = '/home/karim/Tools/python/Projets/mne-biomag-group-demo/'
+    main_path = '/home/karim/Tools/python/Projets/mne-biomag-group-demo/'
 
-    subjects_dir = os.path.join(meg_dir, 'subjects')
-    MRI_path = os.path.join(meg_dir, 'ds117')
-    data_path = os.path.join(meg_dir, 'ds117')
+    subjects_dir = os.path.join(main_path, 'subjects')
+    MRI_path = os.path.join(main_path, 'ds117')
+    data_path = os.path.join(main_path, 'ds117')
 
     NJOBS = 4
 
