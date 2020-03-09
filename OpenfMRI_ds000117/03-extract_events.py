@@ -16,7 +16,7 @@ import os.path as op
 
 from mne.parallel import parallel_func
 
-from params import data_path
+from params import data_path, NJOBS
 
 ###############################################################################
 # this is the dir where the cleaned raw data was saved
@@ -39,7 +39,7 @@ def run_events_concatenate(subject_id):
         run_fname = op.join(ica_dir % (run, subject),
                             'ica', 'run_%02d_sss_filt_ica.fif' % run)
         print(run_fname)
-        raw = mne.io.read_raw_fif(run_fname, preload=True)
+        raw = mne.io.read_raw_fif(run_fname, preload=False)
         mask = 4096 + 256  # mask for excluding high order bits
         events = mne.find_events(raw, stim_channel='STI101',
                                  consecutive='increasing', mask=mask,
@@ -69,5 +69,5 @@ def run_events_concatenate(subject_id):
 ###############################################################################
 # Let us make the script parallel across subjects
 # Here we use fewer N_JOBS to prevent potential memory problems
-parallel, run_func, _ = parallel_func(run_events_concatenate, n_jobs=2)
+parallel, run_func, _ = parallel_func(run_events_concatenate, n_jobs=NJOBS)
 parallel(run_func(subject_id) for subject_id in range(1, 20))
