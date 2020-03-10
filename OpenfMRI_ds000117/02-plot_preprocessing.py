@@ -101,7 +101,6 @@ preproc_workflow = create_pipeline_preproc_meeg(
     #l_freq=l_freq, h_freq=h_freq,
     #variance=variance, ECG_ch_name=ECG_ch_name, EoG_ch_name=EoG_ch_name,
     #data_type=data_type)
-
 ###############################################################################
 # We then connect the nodes two at a time. First, we connect the two outputs
 # (subject_id and session_id) of the infosource node to the datasource node.
@@ -131,6 +130,6 @@ main_workflow.write_graph(graph2use='colored')  # colored
 main_workflow.config['execution'] = {'remove_unnecessary_outputs': 'false'}
 
 # Run workflow locally on 1 CPU
-#main_workflow.run(plugin='LegacyMultiProc', plugin_args={'n_procs': NJOBS})
+main_workflow.run(plugin='LegacyMultiProc', plugin_args={'n_procs': NJOBS})
 
-main_workflow.run()
+#main_workflow.run()
