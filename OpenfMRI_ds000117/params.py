@@ -28,18 +28,21 @@ elif getpass.getuser() == 'karim':
     NJOBS = 4
 
 else:
-    main_path = ''
-    subjects_dir = ''
+    main_path = '/hpc/crise/meunier.d/data_demo'
+    subjects_dir = os.path.join(main_path, 'subjects')
     MRI_path = ''
-    data_path = ''
+    data_path = main_path
 
     NJOBS = 4
 
 # subjects list and session numbering
-subject_ids = ['sub001', 'sub002', 'sub003', 'sub004', 'sub005', 'sub006',
-               'sub007', 'sub008', 'sub009', 'sub010', 'sub011', 'sub012',
-               'sub013', 'sub014', 'sub015', 'sub016', 'sub017', 'sub018',
-               'sub019']
+#subject_ids = ['sub001', 'sub002', 'sub003', 'sub004', 'sub005', 'sub006',
+               #'sub007', 'sub008', 'sub009', 'sub010', 'sub011', 'sub012',
+               #'sub013', 'sub014', 'sub015', 'sub016', 'sub017', 'sub018',
+               #'sub019']
+
+subject_ids = ['sub001', 'sub002']
+
 session_ids = ['01', '02', '03', '04', '05', '06']
 # Subjects that are known to be bad from the publication
 exclude_subjects = [1, 5, 16]  # Excluded subjects

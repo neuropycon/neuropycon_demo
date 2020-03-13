@@ -1,3 +1,6 @@
+# /hpc/crise/meunier.d/Softwares/miniconda/envs/mne/bin/python
+
+
 """
 ==================================
 01. Freesurfer anatomical pipeline
@@ -20,9 +23,23 @@ from nipype.interfaces.utility import Function
 from ephypype.nodes import create_iterator, create_datagrabber
 from ephypype.compute_fwd_problem import _create_bem_sol
 
-from params import subjects_dir, subject_ids, NJOBS
-from params import MRI_path, FS_WF_name, MAIN_WF_name
+import json
 
+rel_path = op.split(os.path.realpath(__file__))[0]
+params = json.load(open(os.path.join(rel_path, "params.json")))
+
+print(params)
+
+subjects_dir = params["subjects_dir"]
+subject_ids = params["subject_ids"]
+NJOBS = params["NJOBS"]
+FS_WF_name = params["FS_WF_name"]
+MAIN_WF_name = params["MAIN_WF_name"]
+
+data_path = os.path.join(rel_path, 'data_demo')
+subjects_dir = os.path.join(data_path, subjects_dir)
+
+wf_path = data_path
 
 def create_main_workflow_FS_segmentation():
 
@@ -38,6 +55,9 @@ def create_main_workflow_FS_segmentation():
 
     print('SUBJECTS_DIR %s ' % os.environ["SUBJECTS_DIR"])
 
+    main_workflow = pe.Workflow(name=MAIN_WF_name)
+    main_workflow.base_dir = subjects_dir
+
     # (1) we create a node to pass input filenames to DataGrabber from nipype
     #     iterate over subjects
     infosource = create_iterator(['subject_id'], [subject_ids])
@@ -50,7 +70,7 @@ def create_main_workflow_FS_segmentation():
     template_path = '%s/anatomy/highres001.nii.gz'
     template_args = [['subject_id']]
     infields = ['subject_id']
-    datasource = create_datagrabber(MRI_path, template_path, template_args,
+    datasource = create_datagrabber(data_path, template_path, template_args,
                                     infields=infields)
 
     # (2) ReconAll Node to generate surfaces and parcellations of structural
@@ -62,7 +82,7 @@ def create_main_workflow_FS_segmentation():
 
     # reconall_workflow will be a node of the main workflow
     reconall_workflow = pe.Workflow(name=FS_WF_name)
-    reconall_workflow.base_dir = MRI_path
+    reconall_workflow.base_dir = wf_path
 
     reconall_workflow.connect(infosource, 'subject_id',
                               recon_all, 'subject_id')
@@ -73,9 +93,6 @@ def create_main_workflow_FS_segmentation():
     reconall_workflow.connect(datasource, 'raw_file', recon_all, 'T1_files')
 
     # (3) BEM generation by make_watershed_bem of MNE Python package
-    main_workflow = pe.Workflow(name=MAIN_WF_name)
-    main_workflow.base_dir = subjects_dir
-
     bem_generation = pe.Node(interface=Function(
             input_names=['subjects_dir', 'sbj_id'], output_names=['sbj_id'],
             function=_create_bem_sol), name='call_mne_watershed_bem')
