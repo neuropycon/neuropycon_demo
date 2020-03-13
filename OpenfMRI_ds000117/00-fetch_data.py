@@ -14,7 +14,11 @@ pwd = os.getcwd()
 print("data_path : %s" % data_path)
 
 if not os.path.exists(data_path):
-    os.mkdir(data_path)
+    data_path = os.path.abspath("data_demo")
+    try:
+        os.mkdir(data_path)
+    except FileExistsError:
+        print ('data_demo already exists')
 
 os.chdir(data_path)
 
