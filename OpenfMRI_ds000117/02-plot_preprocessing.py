@@ -12,15 +12,36 @@ and/or fine-tune the correction in each subject.
 #          Mainak Jas <mainakjas@gmail.com>
 # License: BSD (3-clause)
 
+import os.path as op
 import nipype.pipeline.engine as pe
 
-from params import data_path, data_type, subject_ids, session_ids, NJOBS
+
+import json
+
+### relative path
+import os
+
+rel_path = op.split(os.path.realpath(__file__))[0]
+data_path = op.join(rel_path, "data_demo")
+
+print (data_path)
+
+### params as json
+params = json.load(open(op.join(rel_path, "params.json")))
+
+data_type = params["data_type"]
+subject_ids = params["subject_ids"]
+NJOBS = params["NJOBS"]
+session_ids = params["session_ids"]
+
+print(params)
+
+
 from ephypype.nodes import create_iterator, create_datagrabber
 
 
 ###############################################################################
 # Read the parameters for preprocessing from a json file and print it
-import json  # noqa
 import pprint  # noqa
 data = json.load(open("params_preprocessing.json"))
 pprint.pprint({'preprocessing parameters': data})
@@ -64,6 +85,7 @@ datasource = create_datagrabber(data_path, template_path, template_args)
 # parameters to it.
 
 from ephypype.pipelines.preproc_meeg import create_pipeline_preproc_meeg  # noqa
+
 preproc_workflow = create_pipeline_preproc_meeg(
     data_path, l_freq=l_freq, h_freq=h_freq,
     variance=variance, ECG_ch_name=ECG_ch_name, EoG_ch_name=EoG_ch_name,
