@@ -31,6 +31,7 @@ ECG_ch_name = data['ECG_ch_name']
 EoG_ch_name = data['EoG_ch_name']
 variance = data['variance']
 reject = data['reject']
+down_sfreq = data['down_sfreq']
 
 ###############################################################################
 # Then, we create our workflow and specify the `base_dir` which tells
@@ -67,7 +68,7 @@ from ephypype.pipelines.preproc_meeg import create_pipeline_preproc_meeg  # noqa
 preproc_workflow = create_pipeline_preproc_meeg(
     data_path, l_freq=l_freq, h_freq=h_freq,
     variance=variance, ECG_ch_name=ECG_ch_name, EoG_ch_name=EoG_ch_name,
-    data_type=data_type)
+    data_type=data_type, down_sfreq=down_sfreq)
 
 ###############################################################################
 # We then connect the nodes two at a time. First, we connect the two outputs
@@ -98,4 +99,4 @@ main_workflow.write_graph(graph2use='colored')  # colored
 main_workflow.config['execution'] = {'remove_unnecessary_outputs': 'false'}
 
 # Run workflow locally on 1 CPU
-main_workflow.run(plugin='LegacyMultiProc', plugin_args={'n_procs': NJOBS})
+main_workflow.run(plugin='LegacyMultiProc', plugin_args={'n_procs': 1})
