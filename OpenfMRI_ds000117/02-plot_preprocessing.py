@@ -43,7 +43,7 @@ from ephypype.nodes import create_iterator, create_datagrabber
 ###############################################################################
 # Read the parameters for preprocessing from a json file and print it
 import pprint  # noqa
-data = json.load(open("params_preprocessing.json"))
+data = json.load(open(op.join(rel_path, "params_preprocessing.json")))
 pprint.pprint({'preprocessing parameters': data})
 
 l_freq = data['l_freq']
