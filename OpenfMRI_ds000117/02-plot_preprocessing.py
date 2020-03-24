@@ -121,7 +121,6 @@ main_workflow.write_graph(graph2use='colored')  # colored
 
 ###############################################################################
 # Finally, we are now ready to execute our workflow.
-
 main_workflow.config['execution'] = {'remove_unnecessary_outputs': 'false'}
 
 # Run workflow locally on 1 CPU
