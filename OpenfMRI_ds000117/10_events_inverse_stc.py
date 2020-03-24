@@ -85,7 +85,7 @@ def run_events_concatenate(list_ica_files, subject):
     # could be added in a node to come
     mask = 4096 + 256  # mask for excluding high order bits
     delay_item = 0.0345
-    min_duration = 0.003
+    min_duration = 0.015
 
     #subject = "sub%03d" % subject_id
     print("processing subject: %s" % subject)
@@ -99,10 +99,7 @@ def run_events_concatenate(list_ica_files, subject):
     print("  Loading raw data")
     for i, run_fname in enumerate(list_ica_files):
         run = i+1
-        #run_fname = op.join(ica_dir % (run, subject),
-        #                    'ica', 'run_%02d_sss_filt_ica.fif' % run)
 
-        #print(run_fname)
         raw = mne.io.read_raw_fif(run_fname, preload=True)
 
         events = mne.find_events(raw, stim_channel='STI101',
@@ -180,7 +177,7 @@ def show_files(files):
 
 # full_pipeline
 # workflow directory within the `base_dir`
-src_reconstruction_pipeline_name = 'source_full_reconstruction_' + \
+src_reconstruction_pipeline_name = 'source_dsamp_full_reconstruction_' + \
     inv_method + '_' + parc.replace('.', '')
 
 main_workflow = pe.Workflow(name=src_reconstruction_pipeline_name)
@@ -195,9 +192,9 @@ infosource = create_iterator(['subject_id'], [subject_ids])
 
 # datasource
 ica_dir = op.join(data_path,
-                  'preprocessing_workflow','preproc_meeg_pipeline')
+                  'preprocessing_dsamp_workflow','preproc_meeg_dsamp_pipeline')
 
-template_path = "_session_id_*_subject_id_%s/ica/run_*_sss_filt_ica.fif"
+template_path = "_session_id_*_subject_id_%s/ica/run_*_sss_filt_dsamp_ica.fif"
 template_args = [['subject_id']]
 infields = ['subject_id']
 

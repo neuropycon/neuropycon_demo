@@ -96,11 +96,6 @@ preproc_workflow = create_pipeline_preproc_meeg(
     variance=variance, ECG_ch_name=ECG_ch_name, EoG_ch_name=EoG_ch_name,
     data_type=data_type, down_sfreq=down_sfreq)
 
-#preproc_workflow = create_pipeline_preproc_meeg(
-    #data_path, pipeline_name = "preproc_meeg_pipeline",
-    #l_freq=l_freq, h_freq=h_freq,
-    #variance=variance, ECG_ch_name=ECG_ch_name, EoG_ch_name=EoG_ch_name,
-    #data_type=data_type)
 ###############################################################################
 # We then connect the nodes two at a time. First, we connect the two outputs
 # (subject_id and session_id) of the infosource node to the datasource node.
