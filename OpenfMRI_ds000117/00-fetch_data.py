@@ -10,11 +10,6 @@ import os
 import json
 
 #from params import subjects_dir, data_path
-
-
-import json  # noqa
-import pprint  # noqa
-
 def fetch_data_demo(data_path = ""):
     if data_path == "":
         data_path = os.path.expanduser("")
@@ -58,7 +53,6 @@ def fetch_data_demo(data_path = ""):
     if not os.path.isdir(subjects_dir):
         os.mkdir(subjects_dir)
 
-
 rel_path = os.path.split(os.path.realpath(__file__))[0]
 print(rel_path)
 params = json.load(open(os.path.join(rel_path, "params.json")))
@@ -73,6 +67,5 @@ else:
     data_path = ""
 
 print (data_path, subjects_dir, subject_ids)
-0/0
 
 fetch_data_demo(data_path, subjects_dir, subject_ids)
