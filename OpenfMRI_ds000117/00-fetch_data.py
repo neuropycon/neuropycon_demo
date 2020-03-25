@@ -53,7 +53,6 @@ def fetch_data_demo(data_path = ""):
     if not os.path.isdir(subjects_dir):
         os.mkdir(subjects_dir)
 
-
 rel_path = os.path.split(os.path.realpath(__file__))[0]
 print(rel_path)
 params = json.load(open(os.path.join(rel_path, "params.json")))
