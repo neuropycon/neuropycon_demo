@@ -12,17 +12,43 @@ and/or fine-tune the correction in each subject.
 #          Mainak Jas <mainakjas@gmail.com>
 # License: BSD (3-clause)
 
+import json
+import pprint  # noqa
+
+import os.path as op
 import nipype.pipeline.engine as pe
 
-from params import data_path, data_type, subject_ids, session_ids, NJOBS
+
+
 from ephypype.nodes import create_iterator, create_datagrabber
+
+from ephypype.pipelines.preproc_meeg import create_pipeline_preproc_meeg  # noqa
+
+### relative path
+rel_path = op.split(op.realpath(__file__))[0]
+print (rel_path)
+
+### params as json
+params = json.load(open(op.join(rel_path, "params.json")))
+print(params)
+
+data_type = params["data_type"]
+subject_ids = params["subject_ids"]
+NJOBS = params["NJOBS"]
+session_ids = params["session_ids"]
+
+if "data_path" in params.keys():
+
+    data_path = op.join(params["data_path"], "data_demo")
+else:
+    data_path = op.join(op.expanduser("~"), "data_demo")
+
+print (data_path)
 
 
 ###############################################################################
 # Read the parameters for preprocessing from a json file and print it
-import json  # noqa
-import pprint  # noqa
-data = json.load(open("params_preprocessing.json"))
+data = json.load(open(op.join(rel_path, "params_preprocessing.json")))
 pprint.pprint({'preprocessing parameters': data})
 
 l_freq = data['l_freq']
@@ -38,7 +64,7 @@ down_sfreq = data['down_sfreq']
 # nipype the directory in which to store the outputs.
 
 # workflow directory within the `base_dir`
-preproc_pipeline_name = 'preprocessing_workflow'
+preproc_pipeline_name = 'preprocessing_dsamp_workflow'
 
 main_workflow = pe.Workflow(name=preproc_pipeline_name)
 main_workflow.base_dir = data_path
@@ -64,9 +90,9 @@ datasource = create_datagrabber(data_path, template_path, template_args)
 # instantiate this pipeline node, we import it and pass our
 # parameters to it.
 
-from ephypype.pipelines.preproc_meeg import create_pipeline_preproc_meeg  # noqa
 preproc_workflow = create_pipeline_preproc_meeg(
-    data_path, l_freq=l_freq, h_freq=h_freq,
+    data_path, pipeline_name = "preproc_meeg_dsamp_pipeline",
+    l_freq=l_freq, h_freq=h_freq,
     variance=variance, ECG_ch_name=ECG_ch_name, EoG_ch_name=EoG_ch_name,
     data_type=data_type, down_sfreq=down_sfreq)
 
@@ -95,8 +121,9 @@ main_workflow.write_graph(graph2use='colored')  # colored
 
 ###############################################################################
 # Finally, we are now ready to execute our workflow.
-
 main_workflow.config['execution'] = {'remove_unnecessary_outputs': 'false'}
 
 # Run workflow locally on 1 CPU
-main_workflow.run(plugin='LegacyMultiProc', plugin_args={'n_procs': 1})
+main_workflow.run(plugin='LegacyMultiProc', plugin_args={'n_procs': NJOBS})
+
+#main_workflow.run()
