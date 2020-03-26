@@ -1,11 +1,19 @@
 """
 ============================
-04. Compute inverse solution
+03. Compute inverse solution
 ============================
-The inverse solution pipeline performs source reconstruction starting from the
-raw data specified by the user. The input raw data are epoched accordingly to
-events specified in json file and created in script 03. The evoked datasets are
-created by averaging the different conditions specified in json file.
+This workflow mainly call the ephypype inverse solution pipeline performing
+source reconstruction starting from raw data specified by the user. The first
+Node of the workflow (concat_event Node) extract the events from stimulus
+channel 'STI101'. The events are saved in the Node directory.
+For each subject, the different run are also concatenated in one single raw
+file and saved in concat_event Node directory. The input of this node are the
+different run taken from the preprocessing workflow directory, i.e. the cleaned
+raw data. In the inv_sol_pipeline the raw data are epoched accordingly to
+events specified in json file and created in concat_event Node.
+The evoked datasets are created by averaging the different conditions specified
+in json file. Finally the source estimates obtained by the inverse solution
+pipeline are morphed to the ``fsaverage`` brain in the morph_stc Node.
 """
 
 import os.path as op
@@ -54,7 +62,7 @@ spacing = data['spacing']  # oct-6
 snr = data['snr']
 inv_method = data['method']  # dSPM
 parc = data['parcellation']  # aparc
-trans_fname = data['trans_fname']
+trans_fname = op.join(data_path, data['trans_fname'])
 
 
 ###############################################################################
@@ -108,12 +116,13 @@ def run_events_concatenate(list_ica_files, subject):
 
     raw, events = mne.concatenate_raws(raw_list, events_list=events_list)
     raw.set_eeg_reference(projection=True)
-    raw_file = os.path.abspath('{}_sss_filt_ica-raw.fif'.format(subject))
+    raw_file = os.path.abspath('{}_sss_filt_dsamp_ica-raw.fif'.format(subject))
     print(raw_file)
 
     raw.save(raw_file, overwrite=True)
 
-    event_file = os.path.abspath('{}_sss_filt_ica-raw-eve.fif'.format(subject))
+    event_file = os.path.abspath(
+            '{}_sss_filt_dsamp_ica-raw-eve.fif'.format(subject))
     mne.write_events(event_file, events)
 
     del raw_list
