@@ -33,7 +33,7 @@ session_ids = params["session_ids"]
 if "data_path" in params.keys():
     data_path = op.join(params["data_path"], "data_demo")
 else:
-    data_path = op.join(rel_path, "data_demo")
+    data_path = op.join(op.expanduser("~"), "data_demo")
 print("data_path : %s" % data_path)
 
 ###############################################################################

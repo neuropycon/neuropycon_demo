@@ -13,7 +13,7 @@ import pprint
 
 def fetch_data_demo(data_path="", subjects_dir="", subject_ids=""):
     if data_path == "":
-        data_path = os.path.expanduser("")
+        data_path = os.path.expanduser("~")
 
     data_path = os.path.join(data_path, "data_demo")
     print("data_path : %s" % data_path)

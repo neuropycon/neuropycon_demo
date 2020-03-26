@@ -38,7 +38,7 @@ MAIN_WF_name = params["MAIN_WF_name"]
 if "data_path" in params.keys():
     data_path = op.join(params["data_path"], "data_demo")
 else:
-    data_path = op.join(rel_path, "data_demo")
+    data_path = op.join(os.path.expanduser("~"), "data_demo")
 print("data_path : %s" % data_path)
 subjects_dir = os.path.join(data_path, subjects_dir)
 
