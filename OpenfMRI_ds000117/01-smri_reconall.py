@@ -1,6 +1,3 @@
-# /hpc/crise/meunier.d/Softwares/miniconda/envs/mne/bin/python
-
-
 """
 ==================================
 01. Freesurfer anatomical pipeline
@@ -14,6 +11,8 @@ Make sure that Freesurfer is properly configured before running this script.
 
 # Import modules
 import os
+import json
+import pprint
 import os.path as op
 import nipype.pipeline.engine as pe
 
@@ -23,12 +22,12 @@ from nipype.interfaces.utility import Function
 from ephypype.nodes import create_iterator, create_datagrabber
 from ephypype.compute_fwd_problem import _create_bem_sol
 
-import json
-
 rel_path = op.split(os.path.realpath(__file__))[0]
-params = json.load(open(os.path.join(rel_path, "params.json")))
+print('relative path : {}'.format(rel_path))
 
-print(params)
+# Read experiment params as json
+params = json.load(open(os.path.join(rel_path, "params.json")))
+pprint.pprint({'parameters': params})
 
 subjects_dir = params["subjects_dir"]
 subject_ids = params["subject_ids"]
@@ -36,10 +35,15 @@ NJOBS = params["NJOBS"]
 FS_WF_name = params["FS_WF_name"]
 MAIN_WF_name = params["MAIN_WF_name"]
 
-data_path = os.path.join(rel_path, 'data_demo')
+if "data_path" in params.keys():
+    data_path = op.join(params["data_path"], "data_demo")
+else:
+    data_path = op.join(rel_path, "data_demo")
+print("data_path : %s" % data_path)
 subjects_dir = os.path.join(data_path, subjects_dir)
 
 wf_path = data_path
+
 
 def create_main_workflow_FS_segmentation():
 
