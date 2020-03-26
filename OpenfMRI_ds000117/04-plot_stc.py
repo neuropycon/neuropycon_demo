@@ -1,24 +1,50 @@
 """
 =================
-06. Plot contrast
+04. Plot contrast
 =================
 
 Grand-average group contrasts for dSPM
 """
 import os
+import json
+import pprint
 import os.path as op
 import numpy as np
 from mayavi import mlab
 import mne
 
-from params import main_path
-from params import exclude_subjects, data_path, subjects_dir, conditions
 
+# Relative path
+rel_path = op.split(op.realpath(__file__))[0]
+print(rel_path)
+
+# Read experiment params as json
+params = json.load(open(op.join(rel_path, "params.json")))
+pprint.pprint({'parameters': params})
+
+data_type = params["data_type"]
+subject_ids = params["subject_ids"]
+NJOBS = params["NJOBS"]
+session_ids = params["session_ids"]
+conditions = params["conditions"]
+exclude_subjects = params["exclude_subjects"]
+
+if "data_path" in params.keys():
+    data_path = op.join(params["data_path"], "data_demo")
+else:
+    data_path = op.join(op.expanduser("~"), "data_demo")
+print(data_path)
+
+subjects_dir = op.join(data_path, params["subjects_dir"])
+
+morph_stc_path = \
+    op.join(data_path, 'source_dsamp_full_reconstruction_dSPM_aparc',
+            '_subject_id_{sbj}', 'morph_stc')
 
 os.environ['ETS_TOOLKIT'] = 'qt4'
 os.environ['QT_API'] = 'pyqt5'
 
-fig_path = op.join(main_path, 'figures')
+fig_path = op.join(data_path, 'figures')
 if not os.path.isdir(fig_path):
     os.mkdir(fig_path)
 # PLot
@@ -28,7 +54,7 @@ for cond in conditions:
     for subject_id in range(1, 20):
         if subject_id not in exclude_subjects:
             subject = "sub%03d" % subject_id
-            out_path = op.join(data_path, subject, 'MEG')
+            out_path = morph_stc_path.format(sbj=subject)
             stc = mne.read_source_estimate(
                     op.join(out_path, 'mne_dSPM_inverse_morph-%s' % (cond)))
             stcs.append(stc)
