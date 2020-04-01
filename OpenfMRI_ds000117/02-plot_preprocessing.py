@@ -8,29 +8,22 @@ A report is automatically generated and can be used to correct
 and/or fine-tune the correction in each subject.
 """
 
-# Authors: Annalisa Pascarella <a.pascarella@iac.cnr.it>
-#          Mainak Jas <mainakjas@gmail.com>
-# License: BSD (3-clause)
-
 import json
 import pprint  # noqa
 
 import os.path as op
 import nipype.pipeline.engine as pe
 
-
-
 from ephypype.nodes import create_iterator, create_datagrabber
-
 from ephypype.pipelines.preproc_meeg import create_pipeline_preproc_meeg  # noqa
 
-### relative path
+# Relative path
 rel_path = op.split(op.realpath(__file__))[0]
-print (rel_path)
+print('relative path : {}'.format(rel_path))
 
-### params as json
+# Read experiment params as json
 params = json.load(open(op.join(rel_path, "params.json")))
-print(params)
+pprint.pprint({'parameters': params})
 
 data_type = params["general"]["data_type"]
 subject_ids = params["general"]["subject_ids"]
@@ -44,8 +37,7 @@ else:
 
 data_path = op.join(data_path, "data_demo")
 
-print (data_path)
-
+print("data_path : %s" % data_path)
 
 ###############################################################################
 # Read the parameters for preprocessing from a json file and print it
@@ -91,7 +83,7 @@ datasource = create_datagrabber(data_path, template_path, template_args)
 # parameters to it.
 
 preproc_workflow = create_pipeline_preproc_meeg(
-    data_path, pipeline_name = "preproc_meeg_dsamp_pipeline",
+    data_path, pipeline_name="preproc_meeg_dsamp_pipeline",
     l_freq=l_freq, h_freq=h_freq,
     variance=variance, ECG_ch_name=ECG_ch_name, EoG_ch_name=EoG_ch_name,
     data_type=data_type, down_sfreq=down_sfreq)
@@ -125,5 +117,3 @@ main_workflow.config['execution'] = {'remove_unnecessary_outputs': 'false'}
 
 # Run workflow locally on 1 CPU
 main_workflow.run(plugin='LegacyMultiProc', plugin_args={'n_procs': NJOBS})
-
-#main_workflow.run()
