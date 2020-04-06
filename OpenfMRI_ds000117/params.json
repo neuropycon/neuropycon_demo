@@ -2,10 +2,10 @@
     "general":
     {
         "NJOBS": 4,
-        "subject_ids": ["sub001", "sub002", "sub003", "sub004", "sub005", "sub006",
-                "sub007", "sub008", "sub009", "sub010", "sub011", "sub012",
-                "sub013", "sub014", "sub015", "sub016", "sub017", "sub018",
-                "sub019"],
+        "subject_ids": "subject_ids": ["sub001", "sub002", "sub003", "sub004",
+            "sub005", "sub006", "sub007", "sub008", "sub009", "sub010",
+            "sub011", "sub012", "sub013", "sub014", "sub015", "sub016",
+            "sub017", "sub018", "sub019"],
         "session_ids": ["01", "02", "03", "04", "05", "06"],
         "exclude_subjects": ["sub001", "sub005", "sub016"],
         "FS_WF_name" : "segmentation_workflow",
@@ -15,7 +15,7 @@
         "nb_fsaverage_vertices": 10242,
         "smooth": 10,
         "conditions": ["famous", "scrambled", "unfamiliar"],
-        "subjects_dir": "subjects"
+        "subjects_dir": "subjects",
     },
     "preprocessing":
     {

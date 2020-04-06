@@ -66,6 +66,6 @@ subject_ids = params["general"]["subject_ids"]
 if "data_path" in params["general"].keys():
     data_path = params["general"]["data_path"]
 else:
-    data_path = os.path.expanduser("")
+    data_path = os.path.expanduser("~")
 
 fetch_data_demo(data_path, subjects_dir, subject_ids)

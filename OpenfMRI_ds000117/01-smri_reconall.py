@@ -40,7 +40,7 @@ MAIN_WF_name = params["general"]["MAIN_WF_name"]
 if "data_path" in params["general"].keys():
     data_path = params["general"]["data_path"]
 else:
-    data_path = os.path.expanduser("")
+    data_path = os.path.expanduser("~")
 
 data_path = os.path.join(data_path, 'data_demo')
 

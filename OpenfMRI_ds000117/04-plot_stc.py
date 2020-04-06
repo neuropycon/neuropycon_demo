@@ -38,7 +38,7 @@ data_path = op.join(data_path, "data_demo")
 
 print("data_path : %s" % data_path)
 
-subjects_dir = op.join(data_path, params["subjects_dir"])
+subjects_dir = op.join(data_path, params["general"]["subjects_dir"])
 
 morph_stc_path = \
     op.join(data_path, 'source_dsamp_full_reconstruction_dSPM_aparc',
