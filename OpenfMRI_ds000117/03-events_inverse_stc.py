@@ -33,41 +33,48 @@ print(rel_path)
 
 # Read experiment params as json
 params = json.load(open(op.join(rel_path, "params.json")))
+
 pprint.pprint({'parameters': params})
+print(params["general"])
 
-data_type = params["data_type"]
-subject_ids = params["subject_ids"]
-NJOBS = params["NJOBS"]
-session_ids = params["session_ids"]
+data_type = params["general"]["data_type"]
+subject_ids = params["general"]["subject_ids"]
+NJOBS = params["general"]["NJOBS"]
+session_ids = params["general"]["session_ids"]
+conditions = params["general"]["conditions"]
 
-if "data_path" in params.keys():
-    data_path = op.join(params["data_path"], "data_demo")
+
+if "data_path" in params["general"].keys():
+    data_path = params["general"]["data_path"]
 else:
-    data_path = op.join(op.expanduser("~"), "data_demo")
-print(data_path)
+    data_path = op.expanduser("~")
 
-conditions = params["conditions"]
-subjects_dir = op.join(data_path, params["subjects_dir"])
+data_path = op.join(data_path, "data_demo")
 
-# Read the parameters for inverse solution from a json file and print it
-data = json.load(open(op.join(rel_path, "params_inverse.json")))
-pprint.pprint({'inverse parameters': data})
+print("data_path : %s" % data_path)
 
-events_id = data['events_id']
-condition = data['condition']
-events_file = data['events_file']
-t_min = data['tmin']
-t_max = data['tmax']
-spacing = data['spacing']  # oct-6
-snr = data['snr']
-inv_method = data['method']  # dSPM
-parc = data['parcellation']  # aparc
-trans_fname = op.join(data_path, data['trans_fname'])
+subjects_dir = op.join(data_path, params["general"]["subjects_dir"])
+
+# source reconstruction
+pprint.pprint({'inverse parameters': params["inverse"]})
+
+events_id = params["inverse"]['events_id']
+condition = params["inverse"]['condition']
+events_file = params["inverse"]['events_file']
+t_min = params["inverse"]['tmin']
+t_max = params["inverse"]['tmax']
+spacing = params["inverse"]['spacing']  # oct-6
+snr = params["inverse"]['snr']
+inv_method = params["inverse"]['method']  # dSPM
+parc = params["inverse"]['parcellation']  # aparc
+
+trans_fname = op.join(data_path, params["inverse"]['trans_fname'])
 
 
 ###############################################################################
 # Function to extract events from the stimulus channel
 ###############################################################################
+
 def run_events_concatenate(list_ica_files, subject):
     '''
     The events are extracted from stim channel 'STI101'. The events are saved
@@ -162,7 +169,6 @@ def compute_morph_stc(subject, conditions, cond_files, subjects_dir):
 def show_files(files):
     print(files)
     return files
-
 
 ###############################################################################
 # Defining pipeline to compute inverse solution

@@ -29,21 +29,24 @@ print('relative path : {}'.format(rel_path))
 params = json.load(open(os.path.join(rel_path, "params.json")))
 pprint.pprint({'parameters': params})
 
-subjects_dir = params["subjects_dir"]
-subject_ids = params["subject_ids"]
-NJOBS = params["NJOBS"]
-FS_WF_name = params["FS_WF_name"]
-MAIN_WF_name = params["MAIN_WF_name"]
+print(params["general"])
 
-if "data_path" in params.keys():
-    data_path = op.join(params["data_path"], "data_demo")
+subjects_dir = params["general"]["subjects_dir"]
+subject_ids = params["general"]["subject_ids"]
+NJOBS = params["general"]["NJOBS"]
+FS_WF_name = params["general"]["FS_WF_name"]
+MAIN_WF_name = params["general"]["MAIN_WF_name"]
+
+if "data_path" in params["general"].keys():
+    data_path = params["general"]["data_path"]
 else:
-    data_path = op.join(os.path.expanduser("~"), "data_demo")
-print("data_path : %s" % data_path)
+    data_path = os.path.expanduser("~")
+
+data_path = os.path.join(data_path, 'data_demo')
+
 subjects_dir = os.path.join(data_path, subjects_dir)
 
 wf_path = data_path
-
 
 def create_main_workflow_FS_segmentation():
 

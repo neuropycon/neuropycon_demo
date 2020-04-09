@@ -25,29 +25,31 @@ print('relative path : {}'.format(rel_path))
 params = json.load(open(op.join(rel_path, "params.json")))
 pprint.pprint({'parameters': params})
 
-data_type = params["data_type"]
-subject_ids = params["subject_ids"]
-NJOBS = params["NJOBS"]
-session_ids = params["session_ids"]
+data_type = params["general"]["data_type"]
+subject_ids = params["general"]["subject_ids"]
+NJOBS = params["general"]["NJOBS"]
+session_ids = params["general"]["session_ids"]
 
-if "data_path" in params.keys():
-    data_path = op.join(params["data_path"], "data_demo")
+if "data_path" in params["general"].keys():
+    data_path = params["general"]["data_path"]
 else:
-    data_path = op.join(op.expanduser("~"), "data_demo")
+    data_path = op.expanduser("~")
+
+data_path = op.join(data_path, "data_demo")
+
 print("data_path : %s" % data_path)
 
 ###############################################################################
 # Read the parameters for preprocessing from a json file and print it
-data = json.load(open(op.join(rel_path, "params_preprocessing.json")))
-pprint.pprint({'preprocessing parameters': data})
+pprint.pprint({'preprocessing parameters': params["preprocessing"]})
 
-l_freq = data['l_freq']
-h_freq = data['h_freq']
-ECG_ch_name = data['ECG_ch_name']
-EoG_ch_name = data['EoG_ch_name']
-variance = data['variance']
-reject = data['reject']
-down_sfreq = data['down_sfreq']
+l_freq = params["preprocessing"]['l_freq']
+h_freq = params["preprocessing"]['h_freq']
+ECG_ch_name = params["preprocessing"]['ECG_ch_name']
+EoG_ch_name = params["preprocessing"]['EoG_ch_name']
+variance = params["preprocessing"]['variance']
+reject = params["preprocessing"]['reject']
+down_sfreq = params["preprocessing"]['down_sfreq']
 
 ###############################################################################
 # Then, we create our workflow and specify the `base_dir` which tells

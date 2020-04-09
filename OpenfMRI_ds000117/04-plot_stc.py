@@ -22,20 +22,23 @@ print(rel_path)
 params = json.load(open(op.join(rel_path, "params.json")))
 pprint.pprint({'parameters': params})
 
-data_type = params["data_type"]
-subject_ids = params["subject_ids"]
-NJOBS = params["NJOBS"]
-session_ids = params["session_ids"]
-conditions = params["conditions"]
-exclude_subjects = params["exclude_subjects"]
+data_type = params["general"]["data_type"]
+subject_ids = params["general"]["subject_ids"]
+NJOBS = params["general"]["NJOBS"]
+session_ids = params["general"]["session_ids"]
+conditions = params["general"]["conditions"]
+exclude_subjects = params["general"]["exclude_subjects"]
 
-if "data_path" in params.keys():
-    data_path = op.join(params["data_path"], "data_demo")
+if "data_path" in params["general"].keys():
+    data_path = params["general"]["data_path"]
 else:
-    data_path = op.join(op.expanduser("~"), "data_demo")
-print(data_path)
+    data_path = op.expanduser("~")
 
-subjects_dir = op.join(data_path, params["subjects_dir"])
+data_path = op.join(data_path, "data_demo")
+
+print("data_path : %s" % data_path)
+
+subjects_dir = op.join(data_path, params["general"]["subjects_dir"])
 
 morph_stc_path = \
     op.join(data_path, 'source_dsamp_full_reconstruction_dSPM_aparc',
@@ -51,9 +54,10 @@ if not os.path.isdir(fig_path):
 stc_condition = list()
 for cond in conditions:
     stcs = list()
-    for subject_id in range(1, 20):
-        if subject_id not in exclude_subjects:
-            subject = "sub%03d" % subject_id
+
+    for subject in subject_ids:
+        if subject not in exclude_subjects:
+
             out_path = morph_stc_path.format(sbj=subject)
             stc = mne.read_source_estimate(
                     op.join(out_path, 'mne_dSPM_inverse_morph-%s' % (cond)))

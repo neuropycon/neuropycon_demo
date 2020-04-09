@@ -10,12 +10,10 @@ import os
 import json
 import pprint
 
-
 def fetch_data_demo(data_path="", subjects_dir="", subject_ids=""):
-    if data_path == "":
-        data_path = os.path.expanduser("~")
 
     data_path = os.path.join(data_path, "data_demo")
+
     print("data_path : %s" % data_path)
 
     if not os.path.exists(data_path):
@@ -59,12 +57,15 @@ print('relative path : {}'.format(rel_path))
 params = json.load(open(os.path.join(rel_path, "params.json")))
 
 pprint.pprint({'parameters': params})
-subjects_dir = params["subjects_dir"]
-subject_ids = params["subject_ids"]
 
-if "data_path" in params.keys():
-    data_path = params["data_path"]
+print(params["general"])
+
+subjects_dir = params["general"]["subjects_dir"]
+subject_ids = params["general"]["subject_ids"]
+
+if "data_path" in params["general"].keys():
+    data_path = params["general"]["data_path"]
 else:
-    data_path = ""
+    data_path = os.path.expanduser("~")
 
 fetch_data_demo(data_path, subjects_dir, subject_ids)
