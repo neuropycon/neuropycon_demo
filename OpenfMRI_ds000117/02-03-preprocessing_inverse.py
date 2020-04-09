@@ -16,7 +16,7 @@ import nipype.pipeline.engine as pe
 from nipype.interfaces.utility import IdentityInterface, Function
 import nipype.interfaces.io as nio
 
-from ephypype.nodes import create_iterator, create_datagrabber
+from ephypype.nodes import create_iterator
 from ephypype.pipelines.preproc_meeg import create_pipeline_preproc_meeg  # noqa
 from ephypype.pipelines.fif_to_inv_sol import create_pipeline_source_reconstruction  # noqa
 
@@ -37,7 +37,6 @@ else:
     data_path = op.expanduser("~")
 
 data_path = op.join(data_path, "data_demo")
-
 print("data_path : %s" % data_path)
 
 ###############################################################################
@@ -57,32 +56,28 @@ down_sfreq = params["preprocessing"]['down_sfreq']
 # nipype the directory in which to store the outputs.
 
 # workflow directory within the `base_dir`
-
 main_workflow = pe.Workflow(name='preprocessing_full_inverse')
 main_workflow.base_dir = data_path
 
 ###############################################################################
 # Then we create a node to pass input filenames to DataGrabber from nipype
 
-infosource = create_iterator(['subject_id'],
-                             [subject_ids])
+infosource = create_iterator(['subject_id'], [subject_ids])
 
 ###############################################################################
 # and a node to grab data. The template_args in this node iterate upon
 # the values in the infosource node
 
-
 datasource = pe.Node(interface=nio.DataGrabber(infields=['subject_id'],
-                                                outfields=['raw_file','trans_file']),
-                        name='datasource')
+                                               outfields=['raw_file', 'trans_file']),  # noqa
+                     name='datasource')
 
 datasource.inputs.base_directory = data_path
 datasource.inputs.template = '%s/MEG/%s%s.fif'
 
 datasource.inputs.template_args = dict(
-    raw_file=[['subject_id', "run*","sss"]],
-    trans_file = [['subject_id','subject_id',"-trans"]],
-    )
+        raw_file=[['subject_id', "run*", "sss"]],
+        trans_file=[['subject_id', 'subject_id', "-trans"]])
 
 datasource.inputs.sort_filelist = True
 
@@ -96,8 +91,7 @@ main_workflow.connect(infosource, 'subject_id', datasource, 'subject_id')
 # parameters to it.
 
 preproc_workflow = create_pipeline_preproc_meeg(
-    data_path,
-    l_freq=l_freq, h_freq=h_freq,
+    data_path, l_freq=l_freq, h_freq=h_freq,
     variance=variance, ECG_ch_name=ECG_ch_name, EoG_ch_name=EoG_ch_name,
     data_type=data_type, down_sfreq=down_sfreq, mapnode=True)
 
@@ -106,10 +100,11 @@ main_workflow.connect(infosource, 'subject_id',
 main_workflow.connect(datasource, 'raw_file',
                       preproc_workflow, 'inputnode.raw_file')
 
-## source reconstruction
+# Source reconstruction
 ###############################################################################
 # Function to extract events from the stimulus channel
 ###############################################################################
+
 
 def run_events_concatenate(list_ica_files, subject):
     '''
@@ -215,14 +210,13 @@ def show_files(files):
 
 # building full inverse pipeline
 def create_full_inv_pipeline(data_path, params,
-                             pipeline_name = "full_inv_pipeline"):
+                             pipeline_name="full_inv_pipeline"):
 
     # inverse parameters
     pprint.pprint({'inverse parameters': params["inverse"]})
 
     events_id = params["inverse"]['events_id']
     condition = params["inverse"]['condition']
-    events_file = params["inverse"]['events_file']
     t_min = params["inverse"]['tmin']
     t_max = params["inverse"]['tmax']
     spacing = params["inverse"]['spacing']  # oct-6
@@ -230,11 +224,7 @@ def create_full_inv_pipeline(data_path, params,
     inv_method = params["inverse"]['method']  # dSPM
     parc = params["inverse"]['parcellation']  # aparc
 
-    trans_fname = op.join(data_path, params["inverse"]['trans_fname'])
-
     subjects_dir = op.join(data_path, params["general"]["subjects_dir"])
-
-
 
     # full inverse pipeline
     inv_pipeline = pe.Workflow(name=pipeline_name)
@@ -242,7 +232,7 @@ def create_full_inv_pipeline(data_path, params,
 
     # define the inputs of the pipeline
     inputnode = pe.Node(
-        IdentityInterface(fields=['list_ica_files', 'subject_id', 'trans_file']),
+        IdentityInterface(fields=['list_ica_files', 'subject_id', 'trans_file']),  # noqa
         name='inputnode')
 
     # We connect the output of infosource node to the one of datasource.
@@ -252,32 +242,32 @@ def create_full_inv_pipeline(data_path, params,
     # We define the Node that encapsulates run_events_concatenate function
     concat_event = pe.Node(
         Function(input_names=['list_ica_files', 'subject'],
-                output_names=['raw_file', 'event_file', 'fname_events_files'],
-                function=run_events_concatenate),
+                 output_names=['raw_file', 'event_file', 'fname_events_files'],
+                 function=run_events_concatenate),
         name='concat_event')
 
     # and its connections to the other nodes
     inv_pipeline.connect(inputnode, 'list_ica_files',
-                        concat_event, 'list_ica_files')
+                         concat_event, 'list_ica_files')
     inv_pipeline.connect(inputnode, 'subject_id', concat_event, 'subject')
 
-    ###############################################################################
-    # Ephypype creates for us a pipeline to compute inverse solution which can be
-    # connected to these nodes we created.
+    ###########################################################################
+    # Ephypype creates for us a pipeline to compute inverse solution which can
+    # be connected to these nodes we created.
     inv_sol_workflow = create_pipeline_source_reconstruction(
         data_path, subjects_dir, spacing=spacing, inv_method=inv_method,
-        is_epoched=True, is_evoked=True, events_id=events_id, condition=condition,
-        t_min=t_min, t_max=t_max, all_src_space=True, parc=parc)
+        is_epoched=True, is_evoked=True, events_id=events_id, condition=condition,  # noqa
+        t_min=t_min, t_max=t_max, all_src_space=True, parc=parc, snr=snr)
 
     inv_pipeline.connect(inputnode, 'subject_id',
-                        inv_sol_workflow, 'inputnode.sbj_id')
+                         inv_sol_workflow, 'inputnode.sbj_id')
     inv_pipeline.connect(concat_event, ('raw_file', show_files),
-                        inv_sol_workflow, 'inputnode.raw')
+                         inv_sol_workflow, 'inputnode.raw')
     inv_pipeline.connect(concat_event, ('event_file', show_files),
-                        inv_sol_workflow, 'inputnode.events_file')
+                         inv_sol_workflow, 'inputnode.events_file')
 
     inv_pipeline.connect(inputnode, 'trans_file',
-                        inv_sol_workflow, 'inputnode.trans_file')
+                         inv_sol_workflow, 'inputnode.trans_file')
 
     conditions = params["general"]['conditions']
 
@@ -291,7 +281,7 @@ def create_full_inv_pipeline(data_path, params,
     # and its connections to the other nodes
     inv_pipeline.connect(infosource, 'subject_id', morph_stc, 'subject')
     inv_pipeline.connect(inv_sol_workflow, 'inv_solution.stc_files',
-                        morph_stc, 'cond_files')
+                         morph_stc, 'cond_files')
 
     morph_stc.inputs.conditions = conditions
     morph_stc.inputs.subjects_dir = subjects_dir
@@ -306,7 +296,6 @@ def create_full_inv_pipeline(data_path, params,
 inv_pipeline = create_full_inv_pipeline(data_path, params)
 
 # and its connections to the other nodes
-#main_workflow.connect(preproc_workflow, 'ica_node.ica_ts_file',
 main_workflow.connect(preproc_workflow, 'ica.ica_file',
                       inv_pipeline, 'inputnode.list_ica_files')
 main_workflow.connect(infosource, 'subject_id',
@@ -314,28 +303,13 @@ main_workflow.connect(infosource, 'subject_id',
 main_workflow.connect(datasource, 'trans_file',
                       inv_pipeline, 'inputnode.trans_file')
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 ###############################################################################
 # To do so, we first write the workflow graph (optional)
 main_workflow.write_graph(graph2use='colored')  # colored
-
 
 ###############################################################################
 # Finally, we are now ready to execute our workflow.
 main_workflow.config['execution'] = {'remove_unnecessary_outputs': 'false'}
 
 # Run workflow locally on 1 CPU
-#main_workflow.run(plugin='LegacyMultiProc', plugin_args={'n_procs': NJOBS})
-main_workflow.run()
+main_workflow.run(plugin='LegacyMultiProc', plugin_args={'n_procs': NJOBS})
