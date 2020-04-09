@@ -40,9 +40,17 @@ print("data_path : %s" % data_path)
 
 subjects_dir = op.join(data_path, params["general"]["subjects_dir"])
 
+# TODO: if you ran 02 and 03 separately set this path
+'''
 morph_stc_path = \
     op.join(data_path, 'source_dsamp_full_reconstruction_dSPM_aparc',
             '_subject_id_{sbj}', 'morph_stc')
+'''
+# if you ran 02-03 together set this path
+morph_stc_path = \
+    op.join(data_path, 'preprocessing_full_inverse/full_inv_pipeline',
+            '_subject_id_{sbj}', 'morph_stc')
+
 
 os.environ['ETS_TOOLKIT'] = 'qt4'
 os.environ['QT_API'] = 'pyqt5'
