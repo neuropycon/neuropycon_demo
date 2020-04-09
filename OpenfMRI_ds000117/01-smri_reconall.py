@@ -48,6 +48,7 @@ subjects_dir = os.path.join(data_path, subjects_dir)
 
 wf_path = data_path
 
+
 def create_main_workflow_FS_segmentation():
 
     # Check envoiroment variables

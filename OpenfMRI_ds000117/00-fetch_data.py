@@ -10,6 +10,7 @@ import os
 import json
 import pprint
 
+
 def fetch_data_demo(data_path="", subjects_dir="", subject_ids=""):
 
     data_path = os.path.join(data_path, "data_demo")
