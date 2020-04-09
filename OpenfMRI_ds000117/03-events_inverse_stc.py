@@ -22,6 +22,7 @@ import pprint  # noqa
 
 import nipype.pipeline.engine as pe
 from nipype.interfaces.utility import Function
+import nipype.interfaces.io as nio
 
 from ephypype.nodes import create_iterator, create_datagrabber
 from ephypype.pipelines.fif_to_inv_sol import create_pipeline_source_reconstruction  # noqa
@@ -176,6 +177,7 @@ def show_files(files):
 # Then, we create our workflow and specify the `base_dir` which tells
 # nipype the directory in which to store the outputs.
 
+
 # workflow directory within the `base_dir`
 src_reconstruction_pipeline_name = 'source_dsamp_full_reconstruction_' + \
     inv_method + '_' + parc.replace('.', '')
@@ -191,11 +193,21 @@ infosource = create_iterator(['subject_id'], [subject_ids])
 ica_dir = op.join(
         data_path, 'preprocessing_dsamp_workflow', 'preproc_meeg_dsamp_pipeline')  # noqa
 
-template_path = "_session_id_*_subject_id_%s/ica/run_*_sss_filt_dsamp_ica.fif"
-template_args = [['subject_id']]
-infields = ['subject_id']
-datasource = create_datagrabber(ica_dir, template_path, template_args,
-                                infields=infields)
+datasource = pe.Node(interface=nio.DataGrabber(infields=['subject_id'],
+                                               outfields=['raw_file', 'trans_file']),  # noqa
+                     name='datasource')
+
+datasource.inputs.base_directory = ica_dir
+datasource.inputs.template = '*'
+datasource.inputs.field_template = dict(
+        raw_file="_session_id_*_subject_id_%s/ica/run_*_sss_filt_dsamp_ica.fif",  # noqa
+        trans_file='../../%s/MEG/%s%s.fif')
+
+datasource.inputs.template_args = dict(
+        raw_file=[['subject_id']],
+        trans_file=[['subject_id', 'subject_id', "-trans"]])
+
+datasource.inputs.sort_filelist = True
 
 # We connect the output of infosource node to the one of datasource.
 # So, these two nodes taken together can grab data.
@@ -219,8 +231,7 @@ main_workflow.connect(infosource, 'subject_id', concat_event, 'subject')
 inv_sol_workflow = create_pipeline_source_reconstruction(
     data_path, subjects_dir, spacing=spacing, inv_method=inv_method,
     is_epoched=True, is_evoked=True, events_id=events_id, condition=condition,
-    t_min=t_min, t_max=t_max,
-    trans_fname=trans_fname, all_src_space=True, parc=parc)
+    t_min=t_min, t_max=t_max, all_src_space=True, parc=parc, snr=snr)
 
 main_workflow.connect(infosource, ('subject_id', show_files),
                       inv_sol_workflow, 'inputnode.sbj_id')
@@ -228,7 +239,8 @@ main_workflow.connect(concat_event, ('raw_file', show_files),
                       inv_sol_workflow, 'inputnode.raw')
 main_workflow.connect(concat_event, ('event_file', show_files),
                       inv_sol_workflow, 'inputnode.events_file')
-
+main_workflow.connect(datasource, 'trans_file',
+                      inv_sol_workflow, 'inputnode.trans_file')
 
 # We define the Node that encapsulates compute_morph_stc function
 morph_stc = pe.Node(
